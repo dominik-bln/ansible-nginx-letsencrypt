@@ -1,5 +1,5 @@
 ---
-dependencies:
+dependencies: []
 galaxy_info:
   author: Dominik Horb
   description: Nginx installer with Let's Encrypt hosts
