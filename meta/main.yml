@@ -2,7 +2,7 @@
 dependencies: []
 galaxy_info:
   author: Dominik Horb
-  description: Nginx installer with Let's Encrypt hosts
+  description: Nginx installer based on H5BP recommendations. Simple configuration and renewal of SSL hosts via Let's Encrypt.
   license: MIT
   min_ansible_version: 1.9
   platforms:
