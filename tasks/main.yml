@@ -1,0 +1,10 @@
+---
+- name: Uninstall Apache2
+  apt:
+    name: apache2
+    state: absent
+  when: uninstall_apache
+
+- include: nginx-install.yml
+- include: letsencrypt.yml
+- include: vhosts.yml

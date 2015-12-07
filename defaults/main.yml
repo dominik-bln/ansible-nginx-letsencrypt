@@ -1,0 +1,29 @@
+---
+nginx_domains:
+  example.com:
+    create_vhost: true # create a virtual host file in sites-enabled
+    enabled: false # symlink to sites-enabled if the host file exists
+    create_htdocs: false # create a htdoces directory
+    create_index: true # create a simple index file in the htdocs
+    letsencrypt: false # create a certificate with letsencrypt
+    http_redirect: true # redirect all http traffic to https
+    redirects: www.example.com # additional aliases to redirect; seperate with whitespace
+    ssl_certificate: false # specify the ssl_certifcate explicitly
+    ssl_certificate_key: false # specify the ssl_certificate_key file
+    trusted_cert: false # specify the ssl_trusted_certificate file directly
+    admin_email: admin@example.com
+
+nginx_root_path: /etc/nginx
+nginx_web_root: /var/www
+nginx_includes_path: "includes"
+nginx_cert_path: "{{nginx_root_path}}/ssl"
+nginx_sites_available: "{{nginx_root_path}}/sites-available"
+nginx_sites_enabled: "{{nginx_root_path}}/sites-enabled"
+nginx_user: www-data
+nginx_certificate_days: 3650
+nginx_subject: /C=DE/ST=Berlin/L=Berlin/O=/CN=*.${{ ansible_fqdn }}
+
+letsencrypt_install_path: /usr/local/letsencrypt
+letsencrypt_cert_path: /etc/letsencrypt/live
+
+uninstall_apache: true

@@ -1,0 +1,29 @@
+---
+- name: Install package for nginx
+  apt:
+    name: nginx
+    state: latest
+
+- name: Copy configuration files
+  copy:
+    src: '{{ item }}'
+    dest: '{{ nginx_root_path }}/'
+  with_items:
+    - ../files/includes
+    - ../files/mime.types
+    - ../files/nginx.conf
+    - ../files/sites-available
+
+- name: Create configuration subdirectories
+  file:
+    name: '{{ item }}'
+    state: directory
+  with_items:
+    - '{{ nginx_sites_available }}'
+    - '{{ nginx_sites_enabled }}'
+    - '{{ nginx_cert_path }}'
+
+- name: Create self-signed SSL default certificate
+  command: openssl req -new -nodes -x509 -subj "{{ nginx_subject }}" -days {{ nginx_certificate_days }} -keyout {{nginx_cert_path}}/default_ssl.key -out {{nginx_cert_path}}/default_ssl.crt -extensions v3_ca arg1
+  args:
+    creates: "{{nginx_cert_path}}/default_ssl.crt"

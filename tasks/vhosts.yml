@@ -1,0 +1,41 @@
+---
+- name: Create webroot directories
+  file:
+    name: "{{ nginx_web_root }}/{{ item.key }}/public"
+    state: directory
+    owner: www-data
+  when: item.value.create_htdocs is undefined or item.value.create_htdocs
+  with_dict: "{{ nginx_domains }}"
+
+- name: Create index pages
+  template:
+    src: index.html
+    dest: "{{ nginx_web_root }}/{{ item.key }}/public"
+    owner: www-data
+  when: item.value.create_htdocs is defined and item.value.create_htdocs and item.value.create_index is defined and item.value.create_htdocs
+  with_dict: "{{ nginx_domains }}"
+
+- name: Create virtual hosts from template
+  template:
+    src: ../templates/sites-available.conf.j2
+    dest: '{{ nginx_root_path }}/sites-available/{{ item.key}}'
+  when: item.value.create_vhost is undefined or item.value.create_vhost
+  with_dict: "{{ nginx_domains }}"
+  notify: reload nginx
+
+- name: Symlink enabled sites
+  file:
+    src: '{{ nginx_root_path }}/sites-available/{{ item.key }}'
+    name: '{{ nginx_root_path }}/sites-enabled/{{ item.key }}'
+    state: link
+  when: item.value.enabled is undefined or item.value.enabled
+  with_dict: "{{ nginx_domains }}"
+  notify: restart nginx
+
+- name: Unlink disabled sites
+  file:
+    name: '{{ nginx_root_path }}/sites-enabled/{{ item.key }}'
+    state: absent
+  when: not item.value.enabled
+  with_dict: "{{ nginx_domains }}"
+  notify: restart nginx

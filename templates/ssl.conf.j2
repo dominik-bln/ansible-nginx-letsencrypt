@@ -1,0 +1,23 @@
+# This default SSL certificate will be served whenever the client lacks support for SNI (Server Name Indication).
+# Make it a symlink to the most important certificate you have, so that users of IE 8 and below on WinXP can see your main site without SSL errors.
+ssl_certificate      { nginx_cert_path }/default_ssl.crt;
+ssl_certificate_key  { nginx_cert_path }/default_ssl.key;
+
+{% if item.value.ssl_certificate is defined and item.value.ssl_certificate %}
+ssl_certificate      { item.value.ssl_certificate };
+{% elif item.value.letsencrypt is undefined or item.value.letsencrypt %}
+ssl_certificate      { letsencrypt_cert_path }/{ item.key }/fullchain.pem;
+{% endif %}
+
+{% if item.value.ssl_certificate_key is defined and item.value.ssl_certificate_key %}
+ssl_certificate_key  { item.value.ssl_certificate_key };
+{% elif item.value.letsencrypt is undefined or item.value.letsencrypt %}
+ssl_certificate_key  { letsencrypt_cert_path }/{ item.key }/privkey.pem;
+{% endif %}
+
+{% if item.value.trusted_cert is defined and item.value.trusted_cert %}
+#trusted cert must be made up of your intermediate certificate followed by root certificate
+ssl_trusted_certificate { item.value.trusted_cert };
+{% elif item.value.letsencrypt is undefined or item.value.letsencrypt %}
+ssl_trusted_certificate { letsencrypt_cert_path }/{ item.key }/chain.pem;
+{% endif %}

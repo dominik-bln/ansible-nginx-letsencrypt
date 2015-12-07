@@ -1,0 +1,29 @@
+---
+- name: Install git to install letsencrypt
+  apt:
+    name: git
+    state: latest
+
+- name: Install letsencrypt
+  git:
+    repo: https://github.com/letsencrypt/letsencrypt
+    dest: "{{ letsencrypt_install_path }}"
+
+# this is necessary until the nginx extension is up to par; makes the standalone letsencrypt directive work
+- name: Stop nginx to create certificates
+  service: name=nginx state=stopped
+
+- name: Check modification times of letsencrypt certificates
+  stat:
+    path: "{{ letsencrypt_cert_path }}/{{ item.key }}/privkey.pem"
+  register: cert_renewal
+  when: item.value.letsencrypt
+  with_dict: "{{ nginx_domains }}"
+
+- name: Create/renew letsencrypt certificates if enabled, nonexistent or 60 days are over
+  command: "{{ letsencrypt_install_path }}/letsencrypt-auto certonly --standalone --renew-by-default --email {{ item.0.value.admin_email }} -d {{ item.0.key }} --agree-tos"
+  when: nginx_domains[item.0].letsencrypt and {{ ansible_date_time.epoch|int - item.1.stat.mtime|int >= 60 * 60 * 24 * 60 }}
+  with_together:
+    - nginx_domains
+    - cert_renewal.results
+  notify: start nginx
