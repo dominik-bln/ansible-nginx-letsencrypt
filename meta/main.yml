@@ -1,0 +1,19 @@
+---
+dependencies:
+galaxy_info:
+  author: Dominik Horb
+  description: Nginx installer with Let's Encrypt hosts
+  license: MIT
+  min_ansible_version: 1.9
+  platforms:
+  - name: Ubuntu
+    versions:
+    - trusty
+  categories:
+  galaxy_tags:
+    - server
+    - letsencrypt
+    - nginx
+    - web
+    - encryption
+    - ubuntu
