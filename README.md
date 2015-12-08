@@ -13,6 +13,9 @@ Install via ansible-galaxy:
 $ ansible-galaxy install dominik-bln.nginx-letsencrypt
 ```
 
+Note: Currently nginx needs to be stopped shortly to create the new certificate.
+Hopfully this will be resolved when the nginx plugin of Let's encrypt is finished.
+
 ## Role Variables
 
 The most important configuration is the `nginx_domains`dictionary where all host configuration is defined. Below shows an example with all possible options and their respective defaults when nothing is set. The only actually required value is `admin_email` as long as `letsencrypt`is set to true.
