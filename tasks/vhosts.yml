@@ -12,13 +12,13 @@
     src: index.html
     dest: "{{ nginx_web_root }}/{{ item.key }}/public"
     owner: www-data
-  when: item.value.create_htdocs is defined and item.value.create_htdocs and item.value.create_index is defined and item.value.create_htdocs
+  when: item.value.create_htdocs is defined and item.value.create_htdocs and item.value.create_index is defined and item.value.create_index
   with_dict: "{{ nginx_domains }}"
 
-- name: Create virtual hosts from template
+- name: Create virtual hosts files from template
   template:
     src: ../templates/sites-available.conf.j2
-    dest: '{{ nginx_root_path }}/sites-available/{{ item.key}}'
+    dest: '{{ nginx_sites_available }}/{{ item.key}}'
   when: item.value.create_vhost is undefined or item.value.create_vhost
   with_dict: "{{ nginx_domains }}"
   notify: reload nginx
@@ -36,6 +36,6 @@
   file:
     name: '{{ nginx_root_path }}/sites-enabled/{{ item.key }}'
     state: absent
-  when: not item.value.enabled
+  when: item.value.enabled is defined and not item.value.enabled
   with_dict: "{{ nginx_domains }}"
   notify: restart nginx

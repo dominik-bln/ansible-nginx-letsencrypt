@@ -3,7 +3,7 @@ nginx_domains:
   example.com:
     create_vhost: true # create a virtual host file in sites-enabled
     enabled: false # symlink to sites-enabled if the host file exists
-    create_htdocs: false # create a htdoces directory
+    create_htdocs: false # create a htdocs directory
     create_index: true # create a simple index file in the htdocs
     letsencrypt: false # create a certificate with letsencrypt
     http_redirect: true # redirect all http traffic to https

@@ -13,11 +13,11 @@
 - name: Stop nginx to create certificates
   service: name=nginx state=stopped
 
-- name: Create new letsencrypt certificates
-  command: "{{ letsencrypt_install_path }}/letsencrypt-auto certonly --standalone --renew-by-default --email {{ nginx_domains[item.0].admin_email }} -d {{ item.0 }} --agree-tos creates={{ letsencrypt_cert_path }}/{{ item.key}}/fullchain.pem"
-  when: item.value.letsencrypt is undefined or item.value.letsencrypt
-  with_dict: "{{ nginx_domains }}"
-  notify: start nginx
+#- name: Create new letsencrypt certificates
+#  command: "{{ letsencrypt_install_path }}/letsencrypt-auto certonly --standalone --renew-by-default --email {{ item.value.admin_email }} -d {{ item.key }} --agree-tos creates={{ letsencrypt_cert_path }}/{{ item.key}}/fullchain.pem"
+#  when: item.value.letsencrypt is undefined or item.value.letsencrypt
+#  with_dict: "{{ nginx_domains }}"
+#  notify: start nginx
 
 - name: Check modification times of existing letsencrypt certificates
   stat:
