@@ -1,10 +1,10 @@
 ---
-- name: Install git to install letsencrypt
+- name: Make sure git is in place to install letsencrypt
   apt:
     name: git
     state: latest
 
-- name: Install letsencrypt
+- name: Install letsencrypt from git
   git:
     repo: https://github.com/letsencrypt/letsencrypt
     dest: "{{ letsencrypt_install_path }}"
@@ -13,17 +13,22 @@
 - name: Stop nginx to create certificates
   service: name=nginx state=stopped
 
-- name: Check modification times of letsencrypt certificates
+- name: Create new letsencrypt certificates
+  command: "{{ letsencrypt_install_path }}/letsencrypt-auto certonly --standalone --renew-by-default --email {{ nginx_domains[item.0].admin_email }} -d {{ item.0 }} --agree-tos creates={{ letsencrypt_cert_path }}/{{ item.key}}/fullchain.pem"
+  when: item.value.letsencrypt is undefined or item.value.letsencrypt
+  with_dict: "{{ nginx_domains }}"
+  notify: start nginx
+
+- name: Check modification times of existing letsencrypt certificates
   stat:
     path: "{{ letsencrypt_cert_path }}/{{ item.key }}/privkey.pem"
   register: cert_renewal
-  when: item.value.letsencrypt
   with_dict: "{{ nginx_domains }}"
 
-- name: Create/renew letsencrypt certificates if enabled, nonexistent or 60 days are over
-  command: "{{ letsencrypt_install_path }}/letsencrypt-auto certonly --standalone --renew-by-default --email {{ item.0.value.admin_email }} -d {{ item.0.key }} --agree-tos"
-  when: nginx_domains[item.0].letsencrypt and {{ ansible_date_time.epoch|int - item.1.stat.mtime|int >= 60 * 60 * 24 * 60 }}
+- name: Renew letsencrypt certificates if expire time is over
+  command: "{{ letsencrypt_install_path }}/letsencrypt-auto certonly --standalone --renew-by-default --email {{ nginx_domains[item.0].admin_email }} -d {{ item.0 }} --agree-tos"
+  when: "{{ item.1.stat.mtime is defined and ansible_date_time.epoch|int - item.1.stat.mtime|int >= letsencrypt_renewal_period }}"
   with_together:
-    - nginx_domains
-    - cert_renewal.results
+    - "{{ nginx_domains }}"
+    - "{{ cert_renewal.results }}"
   notify: start nginx

@@ -25,5 +25,6 @@ nginx_subject: /C=DE/ST=Berlin/L=Berlin/O=/CN=*.${{ ansible_fqdn }}
 
 letsencrypt_install_path: /usr/local/letsencrypt
 letsencrypt_cert_path: /etc/letsencrypt/live
+letsencrypt_renewal_period: "{{ 60 * 60 * 24 * 60 }}"
 
 uninstall_apache: true
